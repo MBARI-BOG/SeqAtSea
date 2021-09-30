@@ -1,0 +1,9 @@
+---
+title: "SeqAtSea"
+author: "Markus Min"
+date: "9/30/2021"
+output: html_document
+---
+
+### Description
+This Rmd file compares Illumina (MiSeq) and MinIon sequencing for the same samples.
