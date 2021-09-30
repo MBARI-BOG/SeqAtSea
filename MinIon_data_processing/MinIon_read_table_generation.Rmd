@@ -1,0 +1,63 @@
+---
+title: "MinIon_read_table_generation"
+author: "Markus Min"
+date: "9/30/2021"
+output: html_document
+---
+
+### Description
+This Rmd file takes the table of individual MinIon reads and reformats them into tables that are recognizable by PhyloSeq.
+
+### Load libraries
+```{r load_libraries}
+library(tidyverse)
+```
+
+
+# Load data
+```{r}
+setwd("/Users/markusmin/Documents/MBARI-2167/SeqAtSea/")
+here::i_am("analysis/SeqAtSea_sample_selection.Rmd")
+C1_10m_minion <- read.csv(here("data", "MinIon", "individual_read_tables", "C1_10m_read_table.tsv"), sep = "\t")
+C1_150m_minion <- read.csv(here("data", "MinIon", "individual_read_tables", "C1_150m_read_table.tsv"), sep = "\t")
+M1_10m_minion <- read.csv(here("data", "MinIon", "individual_read_tables", "M1_10m_read_table.tsv"), sep = "\t")
+M1_150m_minion <- read.csv(here("data", "MinIon", "individual_read_tables", "M1_150m_read_table.tsv"), sep = "\t")
+M2_10m_minion <- read.csv(here("data", "MinIon", "individual_read_tables", "M2_10m_read_table.tsv"), sep = "\t")
+M2_150m_minion <- read.csv(here("data", "MinIon", "individual_read_tables", "M2_150m_read_table.tsv"), sep = "\t")
+```
+
+
+# Function to reformat data
+
+### Read in minion data, prep for plot
+```{r}
+C1_10m_minion <- read.csv("/Users/mmin/Documents/minion/C1_10m/C1_10m_read_table.tsv", sep = "\t")
+# Add an abundance column - 1 for each read
+C1_10m_minion %>% mutate(.,reads = 1) -> C1_10m_minion
+
+
+# Group the reads by taxonomy
+
+# Join at genus level
+C1_10m_minion_genus <- dplyr::select(C1_10m_minion, c(Genus,reads))
+
+C1_10m_minion_genus  %>% group_by(Genus) %>% summarise_all(funs(sum)) -> C1_10m_minion_genus_sums
+
+# Add a proportion of reads column
+C1_10m_minion_genus_sums %>% mutate(., prop_reads = reads/sum(C1_10m_minion_genus_sums$reads)) -> C1_10m_minion_genus_sums
+
+# Determine the top 19 genera, merge other genera into "other" category
+C1_10m_minion_genus_sums$Genus <- as.character(C1_10m_minion_genus_sums$Genus)
+
+C1_10m_minion_genus_sums <- C1_10m_minion_genus_sums[order(-C1_10m_minion_genus_sums$reads),]
+top19_genera <- C1_10m_minion_genus_sums$Genus[1:19]
+
+C1_10m_minion_genus_sums %>% mutate(., Genus_updated = ifelse(Genus %in% top19_genera, Genus, "other")) -> C1_10m_minion_genus_sums
+
+dplyr::select(C1_10m_minion_genus_sums,-Genus) %>% group_by(Genus_updated) %>% summarise_all(funs(sum)) -> C1_10m_minion_genus_sums_for_gg
+C1_10m_minion_genus_sums_for_gg <- C1_10m_minion_genus_sums_for_gg[order(-C1_10m_minion_genus_sums_for_gg$reads),]
+
+C1_10m_minion_genus_sums_for_gg$Genus_updated <- factor(C1_10m_minion_genus_sums_for_gg$Genus_updated, levels = c(subset(C1_10m_minion_genus_sums_for_gg,!(Genus_updated %in% c("other","unassigned")))$Genus_updated, "other","unassigned"))
+
+C1_10m_minion_genus_sums_for_gg$sample <- "C1_10m"
+```

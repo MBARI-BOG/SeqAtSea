@@ -7,3 +7,18 @@ output: html_document
 
 ### Description
 This Rmd file compares Illumina (MiSeq) and MinIon sequencing for the same samples.
+
+### Load libraries
+```{r load_libraries}
+library(tidyverse)
+library(here)
+library(phyloseq)
+```
+
+
+# Load data
+
+## MiSeq
+
+
+## MinIon
