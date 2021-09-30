@@ -1,0 +1,108 @@
+---
+title: "SeqAtSea_sample_selection"
+author: "Markus Min"
+date: "9/30/2021"
+output: html_document
+---
+
+### Description
+This Rmd file subsets the relevant eDNA samples from the master files.
+
+The samples we want are the MBTS samples from the CANON21 cruise:
+1) 
+
+### Load libraries
+```{r}
+library(tidyverse)
+library(here)
+library(phyloseq)
+```
+
+
+# Load data
+
+## COI
+```{r load_COI}
+# Load metadata
+setwd("/Users/markusmin/Documents/MBARI-2167/")
+here::i_am("SeqAtSea/analysis/SeqAtSea_sample_selection.Rmd")
+metadata <- read.csv(file = here::here("meta_analysis", "COI", "Collapsed_meta_table_pcrfilt.csv"), row.names = 1)
+sample_data <- sample_data(metadata)
+
+### Load and fix asv table so that there aren't any leading Xs in the column names
+asv_table <- read.csv(file = here::here("meta_analysis", "COI", "Collapsed_ASV_table_pcrfilt.csv"),row.names = 1, check.names = FALSE)
+destroyX = function(es) {
+  f = es
+  for (col in c(1:ncol(f))){ #for each column in dataframe
+    if (startsWith(colnames(f)[col], "X") == TRUE)  { #if starts with 'X' ..
+      colnames(f)[col] <- substr(colnames(f)[col], 2, 100) #get rid of it
+    }
+  }
+  assign(deparse(substitute(es)), f, inherits = TRUE) #assign corrected data to original name
+}
+asv_table <- destroyX(asv_table)
+asv_table <- otu_table(asv_table,taxa_are_rows = TRUE)
+# Load tax table
+tax_table <- tax_table(as.matrix(read.csv(file = here::here("meta_analysis", "COI", "Collapsed_taxa_table_pcrfilt.csv"),row.names = 1)))
+master_phyloseq_COI <- merge_phyloseq(asv_table,sample_data,tax_table)
+```
+
+
+## 18S
+```{r load_18S}
+# Load metadata
+setwd("/Users/markusmin/Documents/MBARI-2167/")
+here::i_am("SeqAtSea/analysis/SeqAtSea_sample_selection.Rmd")
+metadata <- read.csv(file = here::here("meta_analysis", "18S", "Collapsed_meta_table_pcrfilt.csv"), row.names = 1)
+sample_data <- sample_data(metadata)
+
+### Load and fix asv table so that there aren't any leading Xs in the column names
+asv_table <- read.csv(file = here::here("meta_analysis", "18S", "Collapsed_ASV_table_pcrfilt.csv"),row.names = 1, check.names = FALSE)
+destroyX = function(es) {
+  f = es
+  for (col in c(1:ncol(f))){ #for each column in dataframe
+    if (startsWith(colnames(f)[col], "X") == TRUE)  { #if starts with 'X' ..
+      colnames(f)[col] <- substr(colnames(f)[col], 2, 100) #get rid of it
+    }
+  }
+  assign(deparse(substitute(es)), f, inherits = TRUE) #assign corrected data to original name
+}
+asv_table <- destroyX(asv_table)
+asv_table <- otu_table(asv_table,taxa_are_rows = TRUE)
+# Load tax table
+tax_table <- tax_table(as.matrix(read.csv(file = here::here("meta_analysis", "18S", "Collapsed_taxa_table_pcrfilt.csv"),row.names = 1)))
+master_phyloseq_18S <- merge_phyloseq(asv_table,sample_data,tax_table)
+```
+
+## 12S
+We are still waiting on the 12S samples to be sequenced; need to update this when those become available.
+```{r load_12S}
+# Load metadata
+setwd("/Users/markusmin/Documents/MBARI-2167/")
+here::i_am("SeqAtSea/analysis/SeqAtSea_sample_selection.Rmd")
+metadata <- read.csv(file = here::here("meta_analysis", "12S", "Collapsed_meta_table_pcrfilt.csv"), row.names = 1)
+sample_data <- sample_data(metadata)
+
+### Load and fix asv table so that there aren't any leading Xs in the column names
+asv_table <- read.csv(file = here::here("meta_analysis", "12S", "Collapsed_ASV_table_pcrfilt.csv"),row.names = 1, check.names = FALSE)
+destroyX = function(es) {
+  f = es
+  for (col in c(1:ncol(f))){ #for each column in dataframe
+    if (startsWith(colnames(f)[col], "X") == TRUE)  { #if starts with 'X' ..
+      colnames(f)[col] <- substr(colnames(f)[col], 2, 100) #get rid of it
+    }
+  }
+  assign(deparse(substitute(es)), f, inherits = TRUE) #assign corrected data to original name
+}
+asv_table <- destroyX(asv_table)
+asv_table <- otu_table(asv_table,taxa_are_rows = TRUE)
+# Load tax table
+tax_table <- tax_table(as.matrix(read.csv(file = here::here("meta_analysis", "12S", "Collapsed_taxa_table_pcrfilt.csv"),row.names = 1)))
+master_phyloseq_12S <- merge_phyloseq(asv_table,sample_data,tax_table)
+```
+
+# Subset the samples for comparison
+```{r}
+
+```
+
