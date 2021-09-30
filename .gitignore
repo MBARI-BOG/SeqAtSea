@@ -4,3 +4,6 @@
 .Ruserdata
 
 .DS_Store
+
+# ignore the big data files
+individual_read_tables/
